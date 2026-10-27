@@ -337,7 +337,7 @@ V.profile=()=>{const st=visitStats();const recent=[...S.visits].reverse();return
 
 V.editInterests=()=>`${status}<div class="body" style="gap:20px;padding-top:12px">
   ${hdr(backBtn)}
-  ${title('Edit interests','Picks on Home and Discover follow these.')}
+  ${title('Edit interests',"Tell us what you'd love to try.")}
   <div class="ilist">${INTERESTS.map(([n,i])=>`<button class="ibtn ${S.intDraft.includes(n)?'on':''}" data-intd="${esc(n)}" aria-pressed="${S.intDraft.includes(n)}">${ic(i,16)}${n}</button>`).join('')}</div>
   ${S.intErr?`<p class="err">Keep at least one interest.</p>`:''}
   <div style="flex:1"></div>
