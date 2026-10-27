@@ -23,7 +23,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 input{font:inherit}
 :focus-visible{outline:2px solid var(--plum);outline-offset:2px}
 .stage{min-height:100%;display:flex;gap:40px;align-items:center;justify-content:center;padding-block:20px}
-.rail{width:240px;flex:none;align-self:center;display:flex;flex-direction:column;gap:18px}
+.rail{width:260px;flex:none;align-self:center;display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;padding-right:4px}
+.rail .task{margin:2px 0 8px;font-size:12.5px;line-height:1.45;color:var(--page-ink);text-wrap:pretty}
 .rail h1{font:700 22px/1 var(--sans);letter-spacing:-.01em;margin:0}
 .rail p{margin:0;color:var(--page-mute);font-size:13px;line-height:1.45}
 .rail h2{font:700 10.5px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--page-mute);margin:0 0 6px}
@@ -125,10 +126,7 @@ input{font:inherit}
 
 <div class="stage">
   <aside class="rail" aria-label="Prototype screens">
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <h1>Elsewhere</h1>
-      <p>CS147 A6 revised prototype. Every control on the phone works; use this list to jump straight to a screen.</p>
-    </div>
+    <h1>Elsewhere</h1>
     <div id="railList"></div>
     <button class="reset" id="resetBtn">Reset prototype</button>
   </aside>
@@ -542,12 +540,11 @@ function sheetHTML(){if(S.sheet==='filters'){const f=S.filter;return `<div class
 
 /* ---------- render ---------- */
 const RAIL=[['Auth & onboarding',[['16','login','Login'],['21','interests','Choose Interests'],['22','onFriends','Choose Friends']]],
- ['Simple · explore & plan',[['01','home','Home'],['02','discover','Discover'],['03','explore','Expanded Card'],['04','confirmed','Confirmed']]],
- ['Spontaneous hangout',[['23','hangout','Solo or Friends'],['24','hangCircles','Choose Circles'],['25','match','Mutual Match'],['26','meetup','Meetup Confirmed']]],
- ['Moderate · budget',[['06','budget','Budget Overview'],['07','editBudget','Edit Budget'],['08','budgetDone','Updated']]],
- ['Complex · circles',[['09','friends','Friends List'],['10','circles','My Circles'],['11','editCircle','Edit Circle'],['12','circlesDone','Circles Updated']]],
+ ['Task 1 · Simple',[['01','home','Home'],['02','discover','Discover'],['03','explore','Expanded Card'],['04','confirmed','Confirmed'],['23','hangout','Solo or Friends'],['24','hangCircles','Choose Circles'],['25','match','Mutual Match'],['26','meetup','Meetup Confirmed']],'Explore a spontaneous event for an unexpected free hour.'],
+ ['Task 2 · Moderate',[['06','budget','Budget Overview'],['07','editBudget','Edit Budget'],['08','budgetDone','Updated']],'Organize a daily, weekly, or monthly budget you’re willing to stick to for your spontaneous events.'],
+ ['Task 3 · Complex',[['09','friends','Friends List'],['10','circles','My Circles'],['11','editCircle','Edit Circle'],['12','circlesDone','Circles Updated']],'Organize friends into circles so you prioritize hanging out with the people you actually want to spend time with.'],
  ['Profile',[['P1','profile','Profile & Your Map'],['P2','editInterests','Edit Interests']]]];
-function renderRail(){document.getElementById('railList').innerHTML=RAIL.map(([g,items])=>`<div style="margin-bottom:12px"><h2>${g}</h2><ol>${items.map(([n,k,l])=>`<li><button data-jump="${k}" ${S.screen===k?'aria-current="true"':''}><span>${n}</span>${l}</button></li>`).join('')}</ol></div>`).join('')}
+function renderRail(){document.getElementById('railList').innerHTML=RAIL.map(([g,items,task])=>`<div style="margin-bottom:12px"><h2>${g}</h2>${task?`<p class="task">${task}</p>`:''}<ol>${items.map(([n,k,l])=>`<li><button data-jump="${k}" ${S.screen===k?'aria-current="true"':''}><span>${n}</span>${l}</button></li>`).join('')}</ol></div>`).join('')}
 function render(anim){const ph=document.getElementById('phone');const focusId=document.activeElement&&document.activeElement.id;const sel=focusId&&document.activeElement.selectionStart;
  if(S.screen==='chat'&&!S.chatWith)S.chatWith=S.friends[0];
  if(S.screen==='editInterests'&&!S.intDraft)S.intDraft=[...S.interests];
