@@ -59,7 +59,7 @@ The bottom tab bar has **Home, Discover, Circles, Budget and Profile**. Everythi
 1. Open the **Circles** tab (**My Circles**). You start with three circles: Close Friends, Friends and Acquaintances.
 2. Tap a circle (or its pencil icon) to edit it. Search your friends and check or uncheck people.
 3. Tap **Done** to see the circle summary. A person can only be in one circle, so adding someone moves them out of their old one.
-4. **My Friends** lists everyone with their circle. **Message** opens a chat, and **Add friends** adds suggested contacts.
+4. **My Friends** lists everyone with their circle, and **Add friends** adds suggested contacts.
 5. Circles feed back into Task 1: only people in the circle you pick can match with you.
 
 **Profile**
@@ -83,7 +83,6 @@ This is a medium-fidelity prototype, so there is no backend, no real accounts, a
 ### Wizard of Oz techniques
 
 - **Mutual matching:** there are no other users. After **Find a match**, a "Checking your circle…" screen shows for about 1.5 seconds, then the prototype always "finds" a match with a friend from the circle you chose. The friend is picked by a fixed rule, not by anyone's real interest.
-- **Chat replies:** messages you send get an automatic, pre-written reply after about a second.
 - **Calendar sync:** the switch doesn't connect to any calendar. The free window it shows (3:00–4:00pm) is fixed.
 - **Add to Calendar:** shows a confirmation and marks the plan "Added," but nothing is written to a real calendar.
 - **Directions:** "View Directions" and "Open directions" show a confirmation message instead of opening a maps app.

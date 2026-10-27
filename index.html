@@ -166,14 +166,14 @@ function fresh(){return{
   budget:{freq:'weekly',amt:{daily:10,weekly:50,monthly:200},spent:{daily:{food:5,act:0,other:0},weekly:{food:15,act:5,other:5},monthly:{food:60,act:25,other:15}}},
   draft:null,customOpen:false,budErr:false,lastSave:null,
   editCircle:'close',circleDraft:null,circleQ:'',friendsTab:'friends',
-  chatWith:null,chats:{},lastVisit:null,
+  lastVisit:null,
   visits:[{p:'matcha',d:'Oct 3'},{p:'bookstore',d:'Oct 8'},{p:'matcha',d:'Oct 12',w:'jess'},{p:'gallery',d:'Oct 17'},{p:'bookstore',d:'Oct 21',w:'lynn'},{p:'matcha',d:'Oct 24'}],
   plans:[],calSync:true,notif:true,intDraft:null,mapView:'map',
 };}
 let S=fresh();
 
 /* ---------- navigation ---------- */
-const TAB_OF={home:'home',discover:'discover',explore:'discover',confirmed:'discover',budget:'budget',editBudget:'budget',budgetDone:'budget',friends:'circles',circles:'circles',editCircle:'circles',circlesDone:'circles',hangout:'discover',hangCircles:'discover',match:'discover',meetup:'discover',chat:'circles',profile:'profile',editInterests:'profile'};
+const TAB_OF={home:'home',discover:'discover',explore:'discover',confirmed:'discover',budget:'budget',editBudget:'budget',budgetDone:'budget',friends:'circles',circles:'circles',editCircle:'circles',circlesDone:'circles',hangout:'discover',hangCircles:'discover',match:'discover',meetup:'discover',profile:'profile',editInterests:'profile'};
 function go(s,opts={}){if(!opts.replace&&S.screen!==s)S.hist.push(S.screen);S.screen=s;S.sheet=null;render(true)}
 function back(){S.screen=S.hist.pop()||'home';S.sheet=null;render(true)}
 function tab(t){S.hist=[];go(t);S.hist=[]}
@@ -406,7 +406,7 @@ V.meetup=()=>{const p=PLACES[S.place],f=PEOPLE[S.matchWith],c=S.circles.find(x=>
   ${title('Meetup confirmed',`A little serendipity. You’re meeting ${f.name} for ${p.name}.`)}
   <div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="thumb" style="height:100px;border-radius:12px;background-image:${im(p.big)}"></div><div class="serif" style="font-size:23px;line-height:30px">${p.name}</div><div style="display:flex;gap:8px"><span class="chip" style="flex:1">${ic('clock',16)}Today, 3:30 PM</span><span class="chip" style="flex:1">${ic('map-pin',16)}${p.mins} min walk</span></div></div>
   <div class="row" style="background:var(--sage);border-radius:16px;padding:10px 12px"><span class="av" style="width:52px;height:52px;background-image:${im(f.img)}"></span><span style="display:flex;flex-direction:column;gap:4px;align-items:flex-start"><span class="badge">${ic('users',14)}${c.name}</span><b style="font:700 16px/21px var(--sans)">With ${f.name} · confirmed</b></span></div>
-  <div style="display:flex;flex-direction:column;gap:4px"><button class="btn" data-act="directions">Open directions</button><button class="ghost" data-chat="${S.matchWith}">Message ${f.name}</button></div>
+  <div style="display:flex;flex-direction:column;gap:4px"><button class="btn" data-act="directions">Open directions</button><button class="ghost" data-act="home">Done</button></div>
  </div>${nav()}`};
 
 V.confirmed=()=>{const p=PLACES[S.place];const cost=COST[p.price];return `${status}<div class="body" style="padding-top:16px">
@@ -480,7 +480,7 @@ V.friends=()=>`${status}<div class="body" style="padding-top:16px">
   ${hdr()}
   ${title('Friends','Manage your close friends and circles.')}
   <div class="tabs2"><button aria-pressed="true">My Friends</button><button data-act="circles">My Circles</button></div>
-  <div class="card" style="padding:0">${S.friends.map((k,i)=>`<div class="row" style="padding:12px;${i?'border-top:1px solid #ede0e8':''}"><span class="av" style="width:48px;height:48px;background-image:${im(PEOPLE[k].img)}"></span><span style="flex:1"><b style="display:block;font:700 16px/21px var(--sans)">${PEOPLE[k].name}</b><span style="font:400 13px/18px var(--sans);color:var(--mute)">${circleOf(k)}</span></span><button class="chip" data-chat="${k}" style="padding:0 12px">Message</button></div>`).join('')}</div>
+  <div class="card" style="padding:0">${S.friends.map((k,i)=>`<div class="row" style="padding:12px;${i?'border-top:1px solid #ede0e8':''}"><span class="av" style="width:48px;height:48px;background-image:${im(PEOPLE[k].img)}"></span><span style="flex:1"><b style="display:block;font:700 16px/21px var(--sans)">${PEOPLE[k].name}</b><span style="font:400 13px/18px var(--sans);color:var(--mute)">${circleOf(k)}</span></span></div>`).join('')}</div>
   <button class="ghost" data-act="friendsAdd" style="margin-top:4px">${ic('plus',16)}Add friends</button>
  </div>${nav()}`;
 function circleOf(k){const c=S.circles.find(c=>c.members.includes(k));return c?c.name:'Friend'}
@@ -514,15 +514,6 @@ V.circlesDone=()=>`${status}<div class="body" style="padding-top:16px">
   <div style="display:flex;flex-direction:column;gap:4px"><button class="btn" data-act="circles">Done</button><button class="ghost" data-act="home">Home</button></div>
  </div>${nav()}`;
 
-V.chat=()=>{const f=PEOPLE[S.chatWith];const msgs=S.chats[S.chatWith]||[{t:`Hey! Free later today?`,me:false}];S.chats[S.chatWith]=msgs;
- return `${status}<div class="body" style="padding-top:12px;gap:12px">
-  <div class="hdr"><span class="row" style="gap:10px"><span class="av" style="width:36px;height:36px;background-image:${im(f.img)}"></span><b style="font:700 18px/24px var(--sans)">${f.name}</b></span>${backBtn}</div>
-  <div style="flex:1;display:flex;flex-direction:column;gap:8px;justify-content:flex-end" id="msgs">${msgs.map(m=>`<div class="bubble ${m.me?'me':'them'}">${esc(m.t)}</div>`).join('')}</div>
- </div>
- <form id="chatForm" style="flex:none;display:flex;gap:8px;padding:10px 20px 14px;background:var(--bg);border-top:1px solid #e7e0dd">
-  <label class="field" style="flex:1;height:44px"><input id="msg" placeholder="Message ${f.name}" autocomplete="off" aria-label="Message"></label>
-  <button class="round" style="width:44px;height:44px;border-radius:22px;background:var(--pink);border:0" aria-label="Send">${ic('send',18)}</button>
- </form>${nav()}`};
 
 /* ---------- sheets ---------- */
 function sheetHTML(){if(S.sheet==='filters'){const f=S.filter;return `<div class="sheet-bg" data-act="closeSheet"><div class="sheet" role="dialog" aria-label="Filters" data-stop>
@@ -546,13 +537,11 @@ const RAIL=[['Auth & onboarding',[['16','login','Login'],['21','interests','Choo
  ['Profile',[['P1','profile','Profile & Your Map'],['P2','editInterests','Edit Interests']]]];
 function renderRail(){document.getElementById('railList').innerHTML=RAIL.map(([g,items,task])=>`<div style="margin-bottom:12px"><h2>${g}</h2>${task?`<p class="task">${task}</p>`:''}<ol>${items.map(([n,k,l])=>`<li><button data-jump="${k}" ${S.screen===k?'aria-current="true"':''}><span>${n}</span>${l}</button></li>`).join('')}</ol></div>`).join('')}
 function render(anim){const ph=document.getElementById('phone');const focusId=document.activeElement&&document.activeElement.id;const sel=focusId&&document.activeElement.selectionStart;
- if(S.screen==='chat'&&!S.chatWith)S.chatWith=S.friends[0];
  if(S.screen==='editInterests'&&!S.intDraft)S.intDraft=[...S.interests];
  if(S.screen==='editCircle'&&!S.circleDraft)S.circleDraft=[...S.circles.find(c=>c.id===S.editCircle).members];
  if(S.screen==='match'&&!S.matchWith&&!S.matching)pickMatch();
  ph.innerHTML=`<div class="scr ${anim?'screen-in':''}">${V[S.screen]()}</div>${sheetHTML()}<div class="toast" id="toast" role="status"></div>`;
  if(focusId){const el=document.getElementById(focusId);if(el){el.focus();try{el.setSelectionRange(sel,sel)}catch(e){}}}
- const m=document.getElementById('msgs');if(m)m.parentElement.scrollTop=1e6;
  renderRail()}
 
 function pickMatch(){const c=S.circles.find(x=>x.id===S.hangCircle);S.matchWith=c.members[Object.keys(PLACES).indexOf(S.place)%c.members.length]}
@@ -606,7 +595,6 @@ phone.addEventListener('click',e=>{const t=e.target;
  if(d.step){const base=S.draft??S.budget.amt[S.budget.freq];S.draft=Math.max(5,Math.round((base+ +d.step)/5)*5);S.budErr=false;return render()}
  if(d.ec){S.editCircle=d.ec;S.circleDraft=null;S.circleQ='';return go('editCircle')}
  if(d.cm){const i=S.circleDraft.indexOf(d.cm);i<0?S.circleDraft.push(d.cm):S.circleDraft.splice(i,1);return render()}
- if(d.chat){S.chatWith=d.chat;return go('chat')}
  if(d.fp){const a=S.filter.price,i=a.indexOf(d.fp);i<0?a.push(d.fp):a.splice(i,1);return render()}
  if(d.fw){S.filter.walk=+d.fw;return render()}
  if(d.mv){S.mapView=d.mv;return render()}
@@ -625,8 +613,6 @@ phone.addEventListener('input',e=>{const t=e.target;
 });
 phone.addEventListener('submit',e=>{e.preventDefault();
  if(e.target.id==='loginForm')return A.login();
- if(e.target.id==='chatForm'){const inp=document.getElementById('msg');const v=inp.value.trim();if(!v)return;const k=S.chatWith;S.chats[k].push({t:v,me:true});render();
-  setTimeout(()=>{if(S.screen==='chat'&&S.chatWith===k){S.chats[k].push({t:['Sounds good!','I’m in. See you there.','Ha, love that.','Leaving in 10!'][S.chats[k].length%4],me:false});render()}},900)}
 });
 phone.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('g[data-place]')){e.preventDefault();S.place=e.target.dataset.place;return go('explore')}if(e.key==='Enter'&&e.target.id==='pw'){e.preventDefault();A.login()}});
 document.getElementById('railList').addEventListener('click',e=>{const b=e.target.closest('[data-jump]');if(!b)return;const k=b.dataset.jump;
