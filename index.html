@@ -48,6 +48,7 @@ input{font:inherit}
 .status{height:34px;flex:none;display:flex;justify-content:space-between;align-items:flex-end;padding:0 20px;font:700 14px/18px var(--sans);color:var(--ink)}
 .body{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 20px 20px;display:flex;flex-direction:column;gap:16px;scrollbar-width:none}
 .body::-webkit-scrollbar{display:none}
+.body>*{flex-shrink:0}
 .hdr{display:flex;justify-content:space-between;align-items:center;min-height:30px}
 .brand{font:700 22px/28px var(--sans);color:#29272a;letter-spacing:-.01em}
 .round{width:30px;height:30px;border-radius:18px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;color:var(--ink)}
@@ -148,6 +149,8 @@ const PLACES={
   cattown:{name:'Mini Cat Town',mins:10,price:'$',thumb:'3fc8af',card:'3fc8af',big:'084f83',tag:'Coffee and a room full of cats.',cat:'act',dur:'About 45 min'},
   golf:{name:'Mini Golf Tour',mins:10,price:'$',thumb:'87c57b',card:'87c57b',big:'87c57b',tag:'A fun break from your routine.',cat:'act',dur:'About 45 min'},
 };
+const TAGS={matcha:['Cafés','Food'],gallery:['Art','Events'],bookstore:['Cafés','Art'],cattown:['Cafés','Wellness'],golf:['Outdoors','Events']};
+const WANTS={jake:['golf','cattown'],lynn:['gallery','matcha'],tom:['bookstore','golf'],sarah:['matcha','cattown'],maya:['cattown','gallery'],jess:['matcha','bookstore'],alex:['golf'],sophie:['bookstore','gallery']};
 const COST={'$':8,'$$':15,'Free':0};
 const PEOPLE={
   tom:{name:'Tom',img:'9a1b2b'},jake:{name:'Jake',img:'1cc666'},sarah:{name:'Sarah',img:'910a5e'},lynn:{name:'Lynn',img:'44f362'},
@@ -173,7 +176,7 @@ function fresh(){return{
 let S=fresh();
 
 /* ---------- navigation ---------- */
-const TAB_OF={home:'home',discover:'discover',explore:'discover',confirmed:'discover',budget:'budget',editBudget:'budget',budgetDone:'budget',friends:'circles',circles:'circles',editCircle:'circles',circlesDone:'circles',hangout:'discover',hangCircles:'discover',match:'discover',meetup:'discover',profile:'profile',editInterests:'profile'};
+const TAB_OF={noMatch:'discover',home:'home',discover:'discover',explore:'discover',confirmed:'discover',budget:'budget',editBudget:'budget',budgetDone:'budget',friends:'circles',circles:'circles',editCircle:'circles',circlesDone:'circles',hangout:'discover',hangCircles:'discover',match:'discover',meetup:'discover',profile:'profile',editInterests:'profile'};
 function go(s,opts={}){if(!opts.replace&&S.screen!==s)S.hist.push(S.screen);S.screen=s;S.sheet=null;render(true)}
 function back(){S.screen=S.hist.pop()||'home';S.sheet=null;render(true)}
 function tab(t){S.hist=[];go(t);S.hist=[]}
@@ -186,7 +189,7 @@ const status=`<div class="status"><span>9:41</span><span>100%</span></div>`;
 const hdr=(right='')=>`<div class="hdr"><span class="brand">elsewhere</span>${right}</div>`;
 const backBtn=`<button class="round" data-act="back" aria-label="Back">${ic('chevron-left',18)}</button>`;
 const closeBtn=`<button class="round" data-act="home" aria-label="Close">${ic('x',18)}</button>`;
-function nav(){const cur=TAB_OF[S.screen];const items=[['home','house','Home'],['discover','compass','Discover'],['circles','users','Circles'],['budget','wallet','Budget'],['profile','user','Profile']];
+function nav(){let cur=TAB_OF[S.screen];if(S.screen==='explore'){const pv=S.hist.at(-1);if(pv&&TAB_OF[pv])cur=TAB_OF[pv]}const items=[['home','house','Home'],['discover','compass','Discover'],['circles','users','Circles'],['budget','wallet','Budget'],['profile','user','Profile']];
   return `<nav class="nav" aria-label="Tabs">${items.map(([k,i,l])=>`<button data-tab="${k}" ${cur===k?'aria-current="true"':''}>${ic(i,22)}${l}</button>`).join('')}</nav>`}
 const title=(h,s)=>`<div><h1 class="h1">${h}</h1>${s?`<p class="sub">${s}</p>`:''}</div>`;
 function ring(rem,total,size=120){const r=53.4,c=2*Math.PI*r;const f=total>0?Math.max(0,Math.min(1,rem/total)):0;
@@ -230,6 +233,9 @@ function visitMap(){const {c}=visitStats();
 const toggle=(id,on,label)=>`<button role="switch" aria-checked="${on}" aria-label="${label}" data-tog="${id}" style="width:44px;height:26px;border-radius:13px;background:${on?'var(--pink)':'var(--line)'};position:relative;flex:none;transition:background .15s"><span style="position:absolute;top:3px;left:${on?21:3}px;width:20px;height:20px;border-radius:50%;background:#fffcfb;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)"></span></button>`;
 function displayName(){const e=S.email.split('@')[0];const n=e.split(/[._\d+-]/)[0];return n?n[0].toUpperCase()+n.slice(1):'You'}
 
+function why(k){return TAGS[k].filter(t=>S.interests.includes(t))}
+function ranked(){const vc=visitStats().c,sur=S.interests.includes('Surprise me');const pool=Object.keys(PLACES).map(k=>({k,s:why(k).length*2+(sur&&!vc[k]?1:0)})).sort((a,b)=>b.s-a.s||PLACES[a.k].mins-PLACES[b.k].mins);const out=[],seen=new Set();while(pool.length){let i=pool.findIndex(x=>x.s>0&&why(x.k).some(t=>!seen.has(t)));if(i<0)i=0;const [x]=pool.splice(i,1);why(x.k).forEach(t=>seen.add(t));out.push(x.k)}return out}
+function reason(k){const w=why(k);if(w.length)return 'Because you like '+w.join(' and ');if(S.interests.includes('Surprise me')&&!visitStats().c[k])return 'Something new for you';return 'Popular nearby'}
 function budgetCalc(){const b=S.budget,f=b.freq,sp=b.spent[f];const spent=sp.food+sp.act+sp.other;return{f,amt:b.amt[f],sp,spent,rem:b.amt[f]-spent}}
 
 /* ---------- screens ---------- */
@@ -272,22 +278,22 @@ V.onFriends=()=>{const q=S.friendQ.toLowerCase();const list=['maya','jess','alex
   :`<button class="ghost" data-act="finishOnboard" data-skip="1">Skip for now</button><button class="btn" data-act="finishOnboard">Finish → Home${S.onboardFriends.length?` (${S.onboardFriends.length})`:''}</button>`}
  </div>`};
 
-V.home=()=>{const picks=['matcha','gallery','bookstore'];return `${status}<div class="body" style="padding-top:16px">
+V.home=()=>{const picks=ranked().slice(0,3);return `${status}<div class="body" style="padding-top:16px">
   ${hdr()}
   ${title('You have 1 hour free!','A little opening. A new possibility.')}
   <button class="btn" data-act="toMap">Explore Nearby</button>
   ${(()=>{const st=visitStats();return `<button class="card row" data-tab="profile" style="text-align:left;width:100%;background:var(--sage);border-color:var(--sage)"><span style="width:44px;height:44px;border-radius:22px;background:var(--card);display:grid;place-items:center;color:var(--plum)">${ic('map',20)}</span><span style="flex:1"><b style="display:block;font:700 15px/20px var(--sans)">Your map: ${st.places} places, ${S.visits.length} visits</b><span style="font:400 12px/17px var(--sans);color:var(--mute)">See everywhere you've gone this month</span></span><span style="display:grid;transform:rotate(180deg);color:var(--mute)">${ic('chevron-left',16)}</span></button>`})()}
-  <h2 class="h2">Quick picks for you</h2>
-  <div style="display:flex;flex-direction:column;gap:10px">${picks.map(k=>{const p=PLACES[k];return `<button class="card row" data-place="${k}" style="padding:12px;text-align:left;width:100%"><span class="thumb" style="width:78px;height:76px;border-radius:12px;background-image:${im(p.thumb)}"></span><span style="display:flex;flex-direction:column;gap:6px"><span class="serif" style="font-size:20px;line-height:26px;color:var(--ink)">${p.name}</span><span style="font:400 12px/17px var(--sans);color:var(--mute)">${p.mins} mins away · ${p.price}</span></span></button>`}).join('')}</div>
+  <div class="sec"><h2 class="h2">Quick picks for you</h2><button data-act="editInterests" style="font:700 13px/18px var(--sans);color:var(--plum)">Edit interests</button></div>
+  <div style="display:flex;flex-direction:column;gap:10px">${picks.map(k=>{const p=PLACES[k];return `<button class="card row" data-place="${k}" style="padding:12px;text-align:left;width:100%"><span class="thumb" style="width:78px;height:76px;border-radius:12px;background-image:${im(p.thumb)}"></span><span style="display:flex;flex-direction:column;gap:6px"><span class="serif" style="font-size:20px;line-height:26px;color:var(--ink)">${p.name}</span><span style="font:400 12px/17px var(--sans);color:var(--mute)">${p.mins} mins away · ${p.price}</span><span style="font:700 11px/14px var(--sans);color:var(--plum)">${reason(k)}</span></span></button>`}).join('')}</div>
   ${S.lastVisit?`<div class="chip" style="height:auto;padding:10px 12px;background:var(--sage)">${ic('calendar',16)}Next up: ${esc(S.lastVisit)}</div>`:''}
  </div>${nav()}`};
 
 function visiblePlaces(){const q=S.mapQ.trim().toLowerCase(),f=S.filter;return Object.keys(PLACES).filter(k=>{const p=PLACES[k];return(!q||p.name.toLowerCase().includes(q))&&(!f.price.length||f.price.includes(p.price))&&p.mins<=f.walk})}
-V.discover=()=>{const vis=visiblePlaces();const nf=S.filter.price.length+(S.filter.walk<15?1:0);const {c}=visitStats();const g=PLACES.golf;return `${status}<div class="body" style="padding-top:6px;gap:12px">
+V.discover=()=>{const vis=visiblePlaces();const nf=S.filter.price.length+(S.filter.walk<15?1:0);const {c}=visitStats();const rk=ranked();const gk=rk.find(k=>!c[k])||rk[0],g=PLACES[gk];vis.sort((a,b)=>rk.indexOf(a)-rk.indexOf(b));return `${status}<div class="body" style="padding-top:6px;gap:12px">
    ${hdr(`<button class="round" data-act="filters" aria-label="Filters" style="position:relative">${ic('sliders-horizontal',16)}${nf?`<span style="position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--plum);color:#fff;font:700 10px/16px var(--sans)">${nf}</span>`:''}</button>`)}
-   ${title('Discover','Somewhere new within a short walk.')}
+   ${title('Discover','Browse places nearby. Tap one to see details.')}
    <label class="search">${ic('search',16)}<input id="mq" placeholder="Search for places…" value="${esc(S.mapQ)}" aria-label="Search for places"></label>
-   ${!S.mapQ&&!nf?`<button class="card" data-place="golf" style="text-align:left;display:flex;flex-direction:column;gap:6px;width:100%"><span class="thumb" style="height:100px;border-radius:12px;background-image:${im(g.big)}"></span><span class="row" style="justify-content:space-between"><span class="serif" style="font-size:23px;line-height:30px;color:var(--ink)">${g.name}</span>${c.golf?'':'<span class="badge">New to you</span>'}</span><span style="font:400 14px/20px var(--sans);color:var(--mute)">${g.tag} ${g.mins} min walk · ${g.price}</span></button>`:''}
+   ${!S.mapQ&&!nf?`<span class="lbl" style="margin-bottom:-4px">Picked for you · ${reason(gk).replace('Because you like','you like')}</span><button class="card" data-place="${gk}" style="text-align:left;display:flex;flex-direction:column;gap:6px;width:100%"><span class="thumb" style="height:100px;border-radius:12px;background-image:${im(g.big)}"></span><span class="row" style="justify-content:space-between"><span class="serif" style="font-size:23px;line-height:30px;color:var(--ink)">${g.name}</span>${c[gk]?'':'<span class="badge">New to you</span>'}</span><span style="font:400 14px/20px var(--sans);color:var(--mute)">${g.tag} ${g.mins} min walk · ${g.price}</span></button>`:''}
    <h2 class="h2" style="font-size:16px">Nearby</h2>
    ${vis.length?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${vis.map(k=>{const p=PLACES[k];return `<button class="card" data-place="${k}" style="padding:10px;border-radius:16px;text-align:left;display:flex;flex-direction:column;gap:6px;position:relative"><span class="thumb" style="height:72px;border-radius:10px;background-image:${im(p.card||p.thumb)}"></span><span style="font:400 14px/18px var(--sans);color:var(--ink)">${p.name}</span><span style="display:flex;gap:4px;align-items:center;font:400 11px/14px var(--sans);color:var(--mute)">${ic('clock',12)}${p.mins} mins · ${p.price}</span><span style="font:700 11px/14px var(--sans);color:${c[k]?'var(--nav)':'var(--plum)'}">${c[k]?'Been '+c[k]+'×':'New to you'}</span></button>`}).join('')}</div>`
    :`<div class="card" style="text-align:center;color:var(--mute);font-size:14px;padding:20px">Nothing nearby matches. <button data-act="clearFilters" style="color:var(--plum);font-weight:700">Clear search and filters</button></div>`}
@@ -344,21 +350,19 @@ V.editInterests=()=>`${status}<div class="body" style="gap:20px;padding-top:12px
   <button class="btn" data-act="saveInterests">Save interests</button>
  </div>${nav()}`;
 
-V.explore=()=>{const p=PLACES[S.place];return `${status}<div class="body" style="padding-top:16px">
+V.explore=()=>{const p=PLACES[S.place];const n=visitStats().c[S.place]||0;const w=why(S.place);return `${status}<div class="body" style="padding-top:12px;gap:14px">
   ${hdr(backBtn)}
-  <div style="display:flex;flex-direction:column;gap:6px"><h1 class="h1">Explore</h1>
-  <button class="search" data-act="toMap" style="width:100%">${ic('search',16)}<span style="font-size:14px">Search for places…</span></button></div>
+  <div class="thumb" style="height:170px;border-radius:20px;background-image:${im(p.big)}" role="img" aria-label="${esc(p.name)}"></div>
+  <div><h1 class="serif" style="font-size:30px;line-height:36px;margin:0;color:var(--ink)">${p.name}</h1><p class="sub" style="margin-top:4px">${p.tag}</p></div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px"><span class="chip">${ic('map-pin',14)}${p.mins} min walk</span><span class="chip">${ic('wallet',14)}${p.price}</span><span class="chip">${ic('clock',14)}${p.dur.replace('About ','')}</span></div>
+  ${w.length?`<div class="row" style="background:var(--blush);border-radius:16px;padding:10px 12px;color:var(--plum);font:700 13px/18px var(--sans)">${ic('sparkles',16)}Picked for you because you like ${w.join(' and ')}</div>`:''}
   <div class="card" style="display:flex;flex-direction:column;gap:8px">
-   <div style="border-radius:12px;overflow:hidden">${mapHTML(306,100,306/370,-70,{interactive:false,highlight:S.place})}</div>
-   <div class="serif" style="font-size:23px;line-height:30px">Stanford campus</div>
-   <div style="font:400 14px/20px var(--sans);color:var(--mute)">${p.name} — ${p.mins} mins away · ${p.price}</div>
+   <b style="font:700 14px/19px var(--sans)">Where it is</b>
+   <div style="border-radius:12px;overflow:hidden">${mapHTML(306,110,306/370,Math.min(0,Math.max(110-340*306/370,48-(PINS[S.place]||[0,170])[1]*306/370)),{interactive:false,highlight:S.place,visible:[S.place]})}</div>
+   <span style="font:400 13px/18px var(--sans);color:var(--mute)">Stanford campus · ${n?`You've been here ${n} time${n>1?'s':''}`:"You haven't been here yet"}</span>
   </div>
-  <div class="card" style="display:flex;flex-direction:column;gap:8px">
-   <div class="thumb" style="height:100px;border-radius:12px;background-image:${im(p.big)}"></div>
-   <div class="serif" style="font-size:23px;line-height:30px">${p.name}</div>
-   <div style="font:400 14px/20px var(--sans);color:var(--mute);margin-top:-2px">${p.tag}</div>
-   <button class="btn" data-act="plan">Plan a Visit</button>
-  </div></div>${nav()}`};
+  <button class="btn" data-act="plan">Plan a Visit</button>
+ </div>${nav()}`};
 
 V.hangout=()=>{const p=PLACES[S.place];const opt=(k,icon,t,d,bg)=>{const on=S.mode===k;return `<button class="pick ${on?'on':''}" data-mode="${k}" aria-pressed="${on}" style="height:64px"><span style="width:40px;height:40px;border-radius:20px;background:${on?'var(--pink)':bg};display:grid;place-items:center;flex:none">${ic(icon,18)}</span><span style="flex:1"><b style="display:block;font:700 15px/20px var(--sans)">${t}</b><span style="font:400 12px/16px var(--sans);color:var(--mute)">${d}</span></span>${on?`<span class="box on" style="width:20px;height:20px">${ic('check',12,2.5)}</span>`:''}</button>`};
  return `${status}<div class="body" style="gap:10px;padding-top:8px">
@@ -399,6 +403,18 @@ V.match=()=>{const p=PLACES[S.place];if(S.matching)return `${status}<div class="
   </div>
   <div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="thumb" style="height:100px;border-radius:12px;background-image:${im(p.big)}"></div><div class="serif" style="font-size:23px;line-height:30px">${p.name}</div><div style="display:flex;gap:8px"><span class="chip" style="flex:1">${ic('clock',16)}Today, 3:30 PM</span><span class="chip" style="flex:1">${ic('map-pin',16)}${p.mins} min walk</span></div></div>
   <div style="display:flex;flex-direction:column;gap:4px"><button class="btn" data-act="confirmMeetup">Confirm meetup</button><button class="ghost" data-act="home">Not now</button></div>
+ </div>${nav()}`};
+
+V.noMatch=()=>{const p=PLACES[S.place],c=S.circles.find(x=>x.id===S.hangCircle);return `${status}<div class="body" style="gap:16px;padding-top:16px">
+  ${hdr(closeBtn)}
+  ${title("No one's free for this one",c.members.length?`No one in ${c.name} wants to try ${p.name} right now.`:`There's no one in ${c.name} yet.`)}
+  <div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="thumb" style="height:100px;border-radius:12px;background-image:${im(p.big)};filter:grayscale(.35)"></div><div class="serif" style="font-size:23px;line-height:30px">${p.name}</div><span class="chip">${ic('map-pin',16)}${p.mins} min walk · ${p.price}</span></div>
+  <div style="display:flex;gap:10px;align-items:center;background:var(--sage);border-radius:16px;padding:12px;font:400 13px/18px var(--sans);color:var(--nav)">${ic('lock',16)}No one was told you were interested.</div>
+  <div style="display:flex;flex-direction:column;gap:4px">
+   <button class="btn" data-act="goSolo">Go solo instead</button>
+   <button class="ghost" data-act="otherCircle">Try another circle</button>
+   <button class="ghost" data-act="notifyMe">${ic('heart',16)}Tell me if someone's in</button>
+  </div>
  </div>${nav()}`};
 
 V.meetup=()=>{const p=PLACES[S.place],f=PEOPLE[S.matchWith],c=S.circles.find(x=>x.id===S.hangCircle);return `${status}<div class="body" style="gap:18px;padding-top:28px">
@@ -531,7 +547,7 @@ function sheetHTML(){if(S.sheet==='filters'){const f=S.filter;return `<div class
 
 /* ---------- render ---------- */
 const RAIL=[['Auth & onboarding',[['16','login','Login'],['21','interests','Choose Interests'],['22','onFriends','Choose Friends']]],
- ['Task 1 · Simple',[['01','home','Home'],['02','discover','Discover'],['03','explore','Expanded Card'],['04','confirmed','Confirmed'],['23','hangout','Solo or Friends'],['24','hangCircles','Choose Circles'],['25','match','Mutual Match'],['26','meetup','Meetup Confirmed']],'Explore a spontaneous event for an unexpected free hour.'],
+ ['Task 1 · Simple',[['01','home','Home'],['02','discover','Discover'],['03','explore','Place Details'],['04','confirmed','Confirmed'],['23','hangout','Solo or Friends'],['24','hangCircles','Choose Circles'],['25','match','Mutual Match'],['25b','noMatch','No Match'],['26','meetup','Meetup Confirmed']],'Explore a spontaneous event for an unexpected free hour.'],
  ['Task 2 · Moderate',[['06','budget','Budget Overview'],['07','editBudget','Edit Budget'],['08','budgetDone','Updated']],'Organize a daily, weekly, or monthly budget you’re willing to stick to for your spontaneous events.'],
  ['Task 3 · Complex',[['09','friends','Friends List'],['10','circles','My Circles'],['11','editCircle','Edit Circle'],['12','circlesDone','Circles Updated']],'Organize friends into circles so you prioritize hanging out with the people you actually want to spend time with.'],
  ['Profile',[['P1','profile','Profile & Your Map'],['P2','editInterests','Edit Interests']]]];
@@ -539,12 +555,12 @@ function renderRail(){document.getElementById('railList').innerHTML=RAIL.map(([g
 function render(anim){const ph=document.getElementById('phone');const focusId=document.activeElement&&document.activeElement.id;const sel=focusId&&document.activeElement.selectionStart;
  if(S.screen==='editInterests'&&!S.intDraft)S.intDraft=[...S.interests];
  if(S.screen==='editCircle'&&!S.circleDraft)S.circleDraft=[...S.circles.find(c=>c.id===S.editCircle).members];
- if(S.screen==='match'&&!S.matchWith&&!S.matching)pickMatch();
+ if(S.screen==='match'&&!S.matchWith&&!S.matching&&!pickMatch()){S.place='golf';S.hangCircle='close';pickMatch()}
  ph.innerHTML=`<div class="scr ${anim?'screen-in':''}">${V[S.screen]()}</div>${sheetHTML()}<div class="toast" id="toast" role="status"></div>`;
  if(focusId){const el=document.getElementById(focusId);if(el){el.focus();try{el.setSelectionRange(sel,sel)}catch(e){}}}
  renderRail()}
 
-function pickMatch(){const c=S.circles.find(x=>x.id===S.hangCircle);S.matchWith=c.members[Object.keys(PLACES).indexOf(S.place)%c.members.length]}
+function pickMatch(){const c=S.circles.find(x=>x.id===S.hangCircle);S.matchWith=c.members.find(m=>(WANTS[m]||[]).includes(S.place))||null;return S.matchWith}
 
 /* ---------- actions ---------- */
 function addSpend(p){const amt=COST[p.price];if(!amt)return;const b=S.budget;b.spent.weekly[p.cat]+=amt;b.spent.monthly[p.cat]+=amt;b.spent.daily[p.cat]+=amt}
@@ -565,8 +581,11 @@ const A={
  filters:()=>{S.sheet='filters';render()},closeSheet:()=>{S.sheet=null;render()},
  clearFilters:()=>{S.filter={price:[],walk:15};S.mapQ='';render()},
  plan:()=>{S.mode='friends';go('hangout')},
- hangContinue:()=>{if(S.mode==='solo'){addSpend(PLACES[S.place]);S.visits.push({p:S.place,d:'Today'});S.plans.unshift({p:S.place,when:'Today · 3:00–4:00pm',cal:false});S.lastVisit=PLACES[S.place].name+' · Today 3:00pm';go('confirmed')}else{S.hangErr='';go('hangCircles')}},
- findMatch:()=>{const c=S.circles.find(x=>x.id===S.hangCircle);if(!c.members.length){S.hangErr=`No one is in ${c.name} yet. Pick another circle or add people in Circles.`;return render()}S.hangErr='';S.matchWith=null;S.matching=true;go('match');setTimeout(()=>{if(S.screen!=='match')return;S.matching=false;pickMatch();render(true)},1400)},
+ hangContinue:()=>{if(S.mode==='solo')A.goSolo();else{S.hangErr='';go('hangCircles')}},
+ findMatch:()=>{S.hangErr='';S.matchWith=null;S.matching=true;go('match');setTimeout(()=>{if(S.screen!=='match')return;S.matching=false;if(pickMatch())render(true);else go('noMatch',{replace:true})},1400)},
+ goSolo:()=>{addSpend(PLACES[S.place]);S.visits.push({p:S.place,d:'Today'});S.plans.unshift({p:S.place,when:'Today · 3:00–4:00pm',cal:false});S.lastVisit=PLACES[S.place].name+' · Today 3:00pm';go('confirmed')},
+ otherCircle:()=>{go('hangCircles',{replace:true})},
+ notifyMe:()=>{const c=S.circles.find(x=>x.id===S.hangCircle);toast(`We'll tell you if someone in ${c.name} wants to go`)},
  confirmMeetup:()=>{addSpend(PLACES[S.place]);S.visits.push({p:S.place,d:'Today',w:S.matchWith});S.plans.unshift({p:S.place,when:'Today · 3:30pm',w:S.matchWith,cal:false});S.lastVisit=PLACES[S.place].name+' with '+PEOPLE[S.matchWith].name+' · 3:30pm';go('meetup')},
  calendar:()=>{S.lastVisit=PLACES[S.place].name+' · Today 3:00pm';const pl=S.plans.find(x=>x.p===S.place);if(pl)pl.cal=true;toast('Added to your calendar for 3:00pm')},
  share:()=>{const p=PLACES[S.place];const t=`I'm heading to ${p.name} today at 3pm (${p.mins} min walk). Join me?`;const done=()=>toast('Plan copied to clipboard');try{navigator.clipboard.writeText(t).then(done,()=>toast('Plan ready to share: '+p.name))}catch(e){toast('Plan ready to share: '+p.name)}},
@@ -617,7 +636,8 @@ phone.addEventListener('submit',e=>{e.preventDefault();
 phone.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('g[data-place]')){e.preventDefault();S.place=e.target.dataset.place;return go('explore')}if(e.key==='Enter'&&e.target.id==='pw'){e.preventDefault();A.login()}});
 document.getElementById('railList').addEventListener('click',e=>{const b=e.target.closest('[data-jump]');if(!b)return;const k=b.dataset.jump;
  if(k==='match'){S.matching=false;S.matchWith=null}
- if(k==='meetup'&&!S.matchWith)pickMatch();
+ if(k==='meetup'&&!S.matchWith&&!pickMatch()){S.place='golf';S.hangCircle='close';pickMatch()}
+ if(k==='noMatch'){S.place='bookstore';S.hangCircle='close';S.matchWith=null}
  if(k==='editCircle'){S.circleDraft=null}
  if(k==='editBudget'){S.draft=null;S.customOpen=false;S.budErr=false}
  if(k==='editInterests'){S.intDraft=[...S.interests];S.intErr=false}

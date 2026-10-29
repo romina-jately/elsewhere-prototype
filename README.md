@@ -41,12 +41,14 @@ The bottom tab bar has **Home, Discover, Circles, Budget and Profile**. Everythi
 3. Optionally select friends to add, then tap **Finish** (or **Skip for now**).
 
 **Task 1 (Simple): explore a spontaneous event**
-1. On **Home**, tap **Explore Nearby**, or tap one of the quick picks.
-2. On **Discover**, search or use the filter button (price, walking time), then tap a place.
-3. On the place card, tap **Plan a Visit**.
+1. On **Home**, the quick picks are ranked by the interests you chose, each with the reason ("Because you like Cafés"). Tap one, or tap **Explore Nearby**.
+2. **Discover** is the browsing page: a featured pick for you, search, filters (price, walking time) and every place nearby. Tap a place.
+3. That opens the **place details** page: photo, walk time, price, length, why it was picked for you, where it is, and whether you've been. Tap **Plan a Visit**.
 4. Choose **Go solo** to go straight to a confirmation, or **See who's interested** to try a hangout:
    - pick a circle and tap **Find a match**;
-   - after a short search you see **It's a match!**; tap **Confirm meetup**.
+   - if someone in that circle also wants to go, you see **It's a match!**; tap **Confirm meetup**;
+   - if no one does (or the circle is empty), you see **No one's free for this one**, with **Go solo instead**, **Try another circle**, or **Tell me if someone's in**.
+   - To see each outcome: Mini Golf Tour with Close Friends matches with Jake; Bookstore with Close Friends finds no one; Bookstore with Friends matches with Tom.
 5. The confirmed plan appears on Home ("Next up"), in Profile under Calendar, and on your map in Profile.
 
 **Task 2 (Moderate): set a budget**
@@ -64,7 +66,7 @@ The bottom tab bar has **Home, Discover, Circles, Budget and Profile**. Everythi
 
 **Profile**
 - **Your map:** a map of campus showing every place you've been. Bigger circles mean more visits, a line traces the order you went, and dashed circles are places you haven't tried. Switch to **List** for a dated history. Tap any place to open it.
-- **Interests:** tap **Edit** to change them.
+- **Interests:** tap **Edit** to change them. Home and Discover reorder right away.
 - **Calendar:** a sync switch and your upcoming plans, each with an **Add** button.
 - **Settings:** a free-time nudges switch, your budget, and **Log out**.
 
@@ -82,7 +84,7 @@ This is a medium-fidelity prototype, so there is no backend, no real accounts, a
 
 ### Wizard of Oz techniques
 
-- **Mutual matching:** there are no other users. After **Find a match**, a "Checking your circle…" screen shows for about 1.5 seconds, then the prototype always "finds" a match with a friend from the circle you chose. The friend is picked by a fixed rule, not by anyone's real interest.
+- **Mutual matching:** there are no other users. After **Find a match**, a "Checking your circle…" screen shows for about 1.5 seconds. Each fake friend has a fixed list of places they "want to try"; if someone in the circle you chose has this place on their list, it's a match, otherwise you get the no-match screen. No one is actually asked.
 - **Calendar sync:** the switch doesn't connect to any calendar. The free window it shows (3:00–4:00pm) is fixed.
 - **Add to Calendar:** shows a confirmation and marks the plan "Added," but nothing is written to a real calendar.
 - **Directions:** "View Directions" and "Open directions" show a confirmation message instead of opening a maps app.
@@ -94,8 +96,8 @@ This is a medium-fidelity prototype, so there is no backend, no real accounts, a
 
 - **Login:** any valid-looking email and any password are accepted. Nothing is checked against real accounts or stored.
 - **Free time and plan times:** "You have 1 hour free!", "Today · 3:00–4:00pm" (solo) and "Today, 3:30 PM" (meetup) are fixed. The status bar always shows 9:41 and 100%.
-- **Places:** five fixed places (Matcha Café, Art Gallery, Bookstore, Mini Cat Town, Mini Golf Tour), with set walking times, price levels and photos. Mini Golf Tour is always the featured place on Discover.
-- **Recommendations:** Home quick picks and Discover results don't depend on the interests you choose. Interests are saved for the session and shown in Profile, but they don't change any suggestions.
+- **Places:** five fixed places (Matcha Café, Art Gallery, Bookstore, Mini Cat Town, Mini Golf Tour), with set walking times, price levels and photos.
+- **Recommendations:** each place has two fixed interest tags (Matcha Café: Cafés, Food · Art Gallery: Art, Events · Bookstore: Cafés, Art · Mini Cat Town: Cafés, Wellness · Mini Golf Tour: Outdoors, Events). Home and Discover rank places by how many tags match your interests and try to cover each interest at least once; ties go to the closer place. "Surprise me" favors places you haven't been. Music has no matching place yet.
 - **Maps:** the campus maps are a stylized drawing of our Figma map, not a real map. Place positions on it are fixed.
 - **Visit history:** Profile starts with six example visits (Oct 3 to Oct 24) so the map isn't empty. Visits you confirm during testing are added to it.
 - **Friends and contacts:** four starting friends (Tom, Jake, Sarah, Lynn) and four suggested contacts (Maya, Jess, Alex, Sophie). There is no contact sync. Starting circles are Close Friends (Jake, Lynn), Friends (Tom, Sarah) and Acquaintances (empty).
