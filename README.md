@@ -23,7 +23,7 @@ The app is designed for a phone (the screens are 370 × 760, matching our Figma 
 
 ## Context
 
-Elsewhere is meant to break up the monotony of a routine week and add spontaneity to it. It links to your calendar, notices short or unexpected gaps in your day ("You have 1 hour free!"), and suggests things to do nearby in that window. You can go alone, or let Elsewhere quietly check whether someone in your chosen circle of friends wants to do the same thing at the same time. If the interest is mutual, it's a match and you both get the plan. Your interest stays private unless it's mutual.
+Elsewhere is meant to break up the monotony of a routine week and add spontaneity to it. Choose an open time window to plan a nearby outing, then export the confirmed visit to your calendar. You can go alone, or let Elsewhere quietly check whether someone in your chosen circle of friends wants to do the same thing at the same time. If the interest is mutual, it's a match and you both get the plan. Your interest stays private unless it's mutual.
 
 A user should be able to complete three tasks:
 
@@ -42,32 +42,32 @@ The bottom tab bar has **Home, Discover, Circles, Budget and Profile**. Everythi
 
 **Task 1 (Simple): explore a spontaneous event**
 1. On **Home**, the quick picks are ranked by the interests you chose, each with the reason ("Because you like Cafés"). Tap one, or tap **Explore Nearby**.
-2. **Discover** is the browsing page: a featured pick for you, search, filters (price, walking time) and every place nearby. Tap a place.
-3. That opens the **place details** page: photo, walk time, price, length, why it was picked for you, where it is, and whether you've been. Tap **Plan a Visit**.
-4. Choose **Go solo** to go straight to a confirmation, or **See who's interested** to try a hangout:
+2. **Discover** is the browsing page: a featured pick for you, search, filters (estimated price per person and walking time) and every place nearby. Tap a place.
+3. That opens the **place details** page: photo, walk time, estimated price, duration, accessibility information, location, and visit history. Tap **Plan a Visit**.
+4. Choose **Go solo** or **See who's interested**, then enter a date, start time, and duration. The planner checks for past times, insufficient time for the visit, and conflicts with plans already made in Elsewhere. For the friend option:
    - pick a circle and tap **Find a match**;
    - if someone in that circle also wants to go, you see **It's a match!**; tap **Confirm meetup**;
-   - if no one does (or the circle is empty), you see **No one's free for this one**, with **Go solo instead**, **Try another circle**, or **Tell me if someone's in**.
+   - if no one does (or the circle is empty), you see **No one's free for this one**, with **Go solo instead**, **Try another circle**, or **Save interest for this time**.
    - To see each outcome: Mini Golf Tour with Close Friends matches with Jake; Bookstore with Close Friends finds no one; Bookstore with Friends matches with Tom.
-5. The confirmed plan appears on Home ("Next up"), in Profile under Calendar, and on your map in Profile.
+5. The confirmed plan appears on Home ("Next up"), in Profile under Calendar, along with a downloadable calendar file (.ics). Import it into your calendar app to add the visit.
 
 **Task 2 (Moderate): set a budget**
 1. Open the **Budget** tab. Switch between **Daily, Weekly and Monthly** to see each period's spending ring and categories.
 2. Tap **Edit Budget**. Choose a preset ($25, $50, $75), adjust with **− / +** in $5 steps, or tap **Custom** and type an amount.
-3. Tap **Save changes**. The confirmation screen shows the new limit and what's left for the period. Saving without choosing an amount shows "Please choose an amount."
+3. Tap **Save changes**. The confirmation screen shows the new limit and what's left for the period. Enter an amount greater than $0 to save.
 4. Visits you confirm in Task 1 add their cost to the matching category, so the ring updates.
 
 **Task 3 (Complex): organize friends into circles**
 1. Open the **Circles** tab (**My Circles**). You start with three circles: Close Friends, Friends and Acquaintances.
 2. Tap a circle (or its pencil icon) to edit it. Search your friends and check or uncheck people.
-3. Tap **Done** to see the circle summary. A person can only be in one circle, so adding someone moves them out of their old one.
-4. **My Friends** lists everyone with their circle, and **Add friends** adds suggested contacts.
+3. Tap **Save circle** to see the circle summary. The editor previews moves and removals before saving. A person can only be in one circle, so adding someone moves them out of their old one.
+4. **My Friends** lists everyone with their circle, **Add friends** adds suggested contacts and **Remove** optionally takes a friend out of your list and their circle.
 5. Circles feed back into Task 1: only people in the circle you pick can match with you.
 
 **Profile**
 - **Your map:** a map of campus showing every place you've been. Bigger circles mean more visits, a line traces the order you went, and dashed circles are places you haven't tried. Switch to **List** for a dated history. Tap any place to open it.
 - **Interests:** tap **Edit** to change them. Home and Discover reorder right away.
-- **Calendar:** a sync switch and your upcoming plans, each with an **Add** button.
+- **Calendar:** set availability and download a calendar file for a confirmed plan.
 - **Settings:** a free-time nudges switch, your budget, and **Log out**.
 
 ## Tools used to build the prototype
@@ -80,14 +80,12 @@ The bottom tab bar has **Home, Discover, Circles, Budget and Profile**. Everythi
 
 ## Limitations and why
 
-This is a medium-fidelity prototype, so there is no backend, no real accounts, and no connection to other users, calendars or maps. We wanted testers to experience the app as it would feel to use, rather than clicking only the hotspots we expected them to, so every control on screen does something. Where a real feature would need live data, other users or third-party services, we simulated it (Wizard of Oz) or used fixed data (hard-coded). This let us test the three task flows without building infrastructure that a medium-fidelity prototype doesn't call for.
+This is a medium-fidelity prototype, so there is no backend, no real accounts, and no connection to live users or calendar accounts. Calendar export creates a local .ics file. We wanted testers to experience the app as it would feel to use, rather than clicking only the hotspots we expected them to, so every control on screen does something. Where a real feature would need live data, other users or third-party services, we simulated it (Wizard of Oz) or used fixed data (hard-coded). This let us test the three task flows without building infrastructure that a medium-fidelity prototype doesn't call for.
 
 ### Wizard of Oz techniques
 
-- **Mutual matching:** there are no other users. After **Find a match**, a "Checking your circle…" screen shows for about 1.5 seconds. Each fake friend has a fixed list of places they "want to try"; if someone in the circle you chose has this place on their list, it's a match, otherwise you get the no-match screen. No one is actually asked.
-- **Calendar sync:** the switch doesn't connect to any calendar. The free window it shows (3:00–4:00pm) is fixed.
-- **Add to Calendar:** shows a confirmation and marks the plan "Added," but nothing is written to a real calendar.
-- **Directions:** "View Directions" and "Open directions" show a confirmation message instead of opening a maps app.
+- **Mutual matching:** there are no other users. After **Find a match**, a "Checking your circle…" screen shows briefly. Each fake friend has a fixed list of places they "want to try"; if someone in the circle you chose has this place on their list, it's a match, otherwise you get the no-match screen. No one is actually asked.
+- **Directions:** opens Google Maps with the example place as a search term.
 - **Forgot password:** shows "Reset link sent" without sending an email.
 - **Share:** copies a sample invite message to the clipboard instead of opening a share sheet.
 - **Free-time nudges:** the switch changes its state, but no notifications are sent.
@@ -95,11 +93,11 @@ This is a medium-fidelity prototype, so there is no backend, no real accounts, a
 ### Hard-coded items
 
 - **Login:** any valid-looking email and any password are accepted. Nothing is checked against real accounts or stored.
-- **Free time and plan times:** "You have 1 hour free!", "Today · 3:00–4:00pm" (solo) and "Today, 3:30 PM" (meetup) are fixed. The status bar always shows 9:41 and 100%.
-- **Places:** five fixed places (Matcha Café, Art Gallery, Bookstore, Mini Cat Town, Mini Golf Tour), with set walking times, price levels and photos.
+- **Status bar:** always shows 9:41 and 100%.
+- **Places:** five fixed places (Matcha Café, Art Gallery, Bookstore, Mini Cat Town, Mini Golf Tour), with example walking times, estimated prices and photos. Matcha Café’s step-free entrance label is sample data. The other places show wheelchair access as unknown.
 - **Recommendations:** each place has two fixed interest tags (Matcha Café: Cafés, Food · Art Gallery: Art, Events · Bookstore: Cafés, Art · Mini Cat Town: Cafés, Wellness · Mini Golf Tour: Outdoors, Events). Home and Discover rank places by how many tags match your interests and try to cover each interest at least once; ties go to the closer place. "Surprise me" favors places you haven't been. Music has no matching place yet.
 - **Maps:** the campus maps are a stylized drawing of our Figma map, not a real map. Place positions on it are fixed.
-- **Visit history:** Profile starts with six example visits (Oct 3 to Oct 24) so the map isn't empty. Visits you confirm during testing are added to it.
+- **Visit history:** Profile starts with six example visits (Oct 3 to Oct 24) so the map isn't empty. Newly confirmed outings appear in the Calendar section.
 - **Friends and contacts:** four starting friends (Tom, Jake, Sarah, Lynn) and four suggested contacts (Maya, Jess, Alex, Sophie). There is no contact sync. Starting circles are Close Friends (Jake, Lynn), Friends (Tom, Sarah) and Acquaintances (empty).
-- **Budget:** default limits are $10 daily, $50 weekly and $200 monthly, each with example spending already logged. A confirmed visit adds a fixed cost: $8 for "$" places, $15 for "$$" and nothing for free places.
+- **Budget:** default limits are $10 daily, $50 weekly and $200 monthly, each with example spending already logged. A confirmed visit adds the sample estimated cost: $8, $15, or $0, depending on the place.
 - **Session only:** nothing persists. Refreshing the page resets everything.
