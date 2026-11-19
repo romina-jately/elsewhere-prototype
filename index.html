@@ -130,6 +130,7 @@ input{font:inherit}
 .srow+.srow{border-top:1px solid #ede0e8}
 .access-note{display:block;width:fit-content;color:var(--plum);font:700 11px/16px var(--sans)}
 .range-control{width:100%;margin:0;accent-color:var(--plum)}
+.budget-slider{height:44px}
 .availability-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
 .availability-fields label{display:grid;gap:6px;min-width:0}
 .availability-fields input{min-width:0;width:100%;padding:10px 6px;font:400 14px var(--sans);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px}
@@ -619,15 +620,23 @@ V.budget=()=>{const B=budgetCalc(),F=FREQ[B.f];return `${status}<div class="body
   <button class="btn" data-act="editBudget">Edit Budget</button>
  </div>${nav()}`};
 
-V.editBudget=()=>{const B=budgetCalc(),F=FREQ[B.f];return `${status}<div class="body" style="padding-top:12px;gap:14px">
+const BUDGET_SLIDER_MAX={daily:100,weekly:250,monthly:1000};
+V.editBudget=()=>{
+ const B=budgetCalc(),F=FREQ[B.f],amount=parseMoney(S.customText)??B.amt;
+ const max=Math.max(BUDGET_SLIDER_MAX[B.f],Math.ceil(amount)), sliderValue=Math.round(amount);
+ return `${status}<div class="body" style="padding-top:12px;gap:14px">
   ${hdr(backBtn)}
-  ${title('Edit budget','Choose a period and enter your spending limit.')}
+  ${title('Edit budget','Choose a period, then slide to set your limit.')}
   <form id="budgetForm" class="card" style="display:grid;gap:12px">
    <div class="seg" role="group" aria-label="Budget period">${Object.entries(FREQ).map(([k,v])=>`<button type="button" data-freq="${k}" aria-pressed="${k===B.f}">${v.label}</button>`).join('')}</div>
-   <label class="lbl" for="customAmt">${F.label} limit (USD)</label>
-   <div class="field"><span aria-hidden="true">$</span><input id="customAmt" inputmode="decimal" placeholder="0.00" value="${esc(S.customText)}"></div>
-   <div class="seg" role="group" aria-label="Suggested amounts">${[0,25,50,75].map(value=>`<button type="button" data-preset="${value}">${money(value)}</button>`).join('')}</div>
-   <p class="sub" style="margin:0">Enter $0 to plan for free outings.</p>
+   <div class="sec"><label class="lbl" for="budgetAmount">${F.label} limit</label><output id="budgetAmountValue" for="budgetAmount customAmt">${money(amount)}</output></div>
+   <input id="budgetAmount" class="range-control budget-slider" type="range" min="0" max="${max}" step="1" value="${sliderValue}" aria-valuetext="${money(sliderValue)}">
+   <div class="sec sub" style="margin:0"><span>$0</span><span id="budgetAmountMax">${money(max)}</span></div>
+   <details ${S.budErr?'open':''}>
+    <summary>Enter an exact amount</summary>
+    <label class="lbl" for="customAmt">${F.label} limit (USD)</label>
+    <div class="field"><span aria-hidden="true">$</span><input id="customAmt" inputmode="decimal" placeholder="0.00" value="${esc(S.customText)}"></div>
+   </details>
    ${S.budErr?`<p class="err" data-budget-error role="alert">Enter $0 or a positive amount with up to two decimal places.</p>`:''}
    <button type="submit" class="btn">Save changes</button>
   </form>
@@ -833,7 +842,6 @@ phone.addEventListener('click',e=>{const t=e.target;
  if(d.mode){S.mode=d.mode;return render()}
  if(d.hc){S.hangCircle=d.hc;S.hangErr='';return render()}
  if(d.freq){S.budget.freq=d.freq;if(S.screen==='editBudget'){S.customText=String(S.budget.amt[d.freq]);S.budErr=false}return render()}
- if(d.preset!=null){S.customText=d.preset;S.budErr=false;return render()}
  if(d.ec){S.editCircle=d.ec;S.circleDraft=null;S.circleQ='';return go('editCircle')}
  if(d.cm){const i=S.circleDraft.indexOf(d.cm);i<0?S.circleDraft.push(d.cm):S.circleDraft.splice(i,1);return render()}
  if(d.remove){S.removeFriend=d.remove;S.sheet='removeFriend';render();return document.querySelector('[data-act=confirmRemoveFriend]').focus()}
@@ -866,8 +874,18 @@ phone.addEventListener('input',e=>{const t=e.target;
  else if(t.id==='fq'){S.friendQ=t.value;render()}
  else if(t.id==='mq'){S.mapQ=t.value;render()}
  else if(t.id==='cq'){S.circleQ=t.value;render()}
- else if(t.id==='customAmt'){
+ else if(t.id==='budgetAmount'||t.id==='customAmt'){
    S.customText=t.value;
+   const amount=parseMoney(S.customText);
+   const slider=document.getElementById('budgetAmount');
+   if(t===slider)document.getElementById('customAmt').value=t.value;
+   else if(amount!==null){
+     slider.max=Math.max(BUDGET_SLIDER_MAX[S.budget.freq],Math.ceil(amount));
+     slider.value=Math.round(amount);
+     document.getElementById('budgetAmountMax').textContent=money(Number(slider.max));
+   }
+   slider.setAttribute('aria-valuetext',money(Number(slider.value)));
+   document.getElementById('budgetAmountValue').value=amount===null?'—':money(amount);
    if(S.budErr){S.budErr=false;phone.querySelector('[data-budget-error]')?.remove()}
  } else if(t.id==='visitSpend'){
    S.visitSpend=t.value;
