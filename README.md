@@ -53,7 +53,7 @@ The bottom tab bar has **Home, Discover, Circles, Budget and Profile**. Everythi
 
 **Task 2 (Moderate): set a budget**
 1. Open the **Budget** tab. Switch between **Daily, Weekly and Monthly** to see each period's spending ring and categories.
-2. Tap **Edit Budget**. Enter an amount or choose a preset ($0, $25, $50, $75).
+2. Tap **Edit Budget**, choose a period, and drag the slider to set the limit, starting at $0. Open **Enter an exact amount** for cents or amounts outside the slider’s range.
 3. Tap **Save changes**. The confirmation screen shows the new limit and what's left for the period. The summary shows total spent plus planned spending, remaining funds, and any overage.
 4. The totals include sample spending and amounts planned for confirmed visits scheduled in the selected period.
 
