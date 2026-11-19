@@ -27,9 +27,9 @@ Elsewhere is meant to break up the monotony of a routine week and add spontaneit
 
 A user should be able to complete three tasks:
 
-1. **Simple:** Explore an outing for an unexpected free hour. Find an outing for an unexpected free hour.
-2. **Moderate:** Set a daily, weekly, or monthly budget. Choose a period and amount, then save.
-3. **Complex:** Organize friends into circles. Manage selections and understand group changes.
+1. **Simple:** Explore a spontaneous event for an unexpected free hour.
+2. **Moderate:** Decide how much you are willing to spend on your spontaneous activities, and update your preferences in the budget tab.
+3. **Complex:** Prioritize matching for spontaneous activities with the friends that you are closest to.
 
 ## How to operate the prototype
 
@@ -40,7 +40,7 @@ The bottom tab bar has **Home, Discover, Circles, Budget and Profile**. Everythi
 2. Pick at least one interest and tap **Continue**.
 3. Optionally select friends to add, then tap **Finish** (or **Skip for now**).
 
-**Task 1 (Simple): explore an outing for an unexpected free hour**
+**Task 1 (Simple): explore a spontaneous event for an unexpected free hour**
 1. On **Home**, the quick picks are ranked by the interests you chose, each with the reason ("Because you like Cafés"). Tap one, or tap **Explore Nearby**.
 2. **Discover** is the browsing page: a featured pick for you, search, filters (estimated price per person and walking time) and every place nearby. Tap a place.
 3. That opens the **place details** page: photo, walk time, estimated price, duration, accessibility information, location, and visit history. Expand **Travel options** for walking, transit or driving routes in Maps, or tap **Plan a Visit**.
@@ -51,18 +51,18 @@ The bottom tab bar has **Home, Discover, Circles, Budget and Profile**. Everythi
    - To see each outcome: Mini Golf Tour with Close Friends matches with Jake; Bookstore with Close Friends finds no one; Bookstore with Friends matches with Tom.
 5. Home shows the next confirmed outing in a banner above the scrollable content. Profile lists plans under Calendar, with a downloadable calendar file (.ics). Import it into your calendar app to add the visit.
 
-**Task 2 (Moderate): set a budget**
+**Task 2 (Moderate): update your spending preferences**
 1. Open the **Budget** tab. Switch between **Daily, Weekly and Monthly** to see each period's spending ring and categories.
 2. Tap **Edit Budget**, choose a period, and drag the slider to set the limit, starting at $0. Open **Enter an exact amount** for cents or amounts outside the slider’s range.
 3. Tap **Save changes**. The confirmation screen shows the new limit and what's left for the period. The summary shows total spent plus planned spending, remaining funds, and any overage.
 4. The totals include sample spending and amounts planned for confirmed visits scheduled in the selected period.
 
-**Task 3 (Complex): organize friends into circles**
+**Task 3 (Complex): prioritize matching with close friends**
 1. Open the **Circles** tab (**My Circles**). You start with three circles: Close Friends, Friends and Acquaintances.
 2. Tap a circle (or its pencil icon) to edit it. Search your friends and check or uncheck people.
 3. Tap **Save circle** to see the circle summary. Before saving, review the resulting members in each affected circle. Only you can see your circles. A person can only be in one circle, so adding someone moves them out of their old one.
 4. **My Friends** lists everyone with their circle, **Add friends** adds suggested contacts and **Remove** optionally takes a friend out of your list and their circle.
-5. Circles feed back into Task 1: only people in the circle you pick can match with you.
+5. Open an outing and choose **Plan a Visit → See who's interested**. Set your availability, choose **Close Friends**, and tap **Find a match**. Only friends in the selected circle are eligible to match.
 
 **Profile**
 - **Your map:** a map of campus showing every place you've been. Bigger circles mean more visits, a line traces the order you went, and dashed circles are places you haven't tried. Switch to **List** for a dated history. Tap any place to open it.
